@@ -1,3 +1,6 @@
+-----CREATING SILVER TABLE-------- 
+
+
 
 IF Object_ID ('silver.crm_cust_info', 'U') IS NOT NULL
 	DROP TABLE silver.crm_cust_info;
