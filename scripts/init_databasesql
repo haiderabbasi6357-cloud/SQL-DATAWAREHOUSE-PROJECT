@@ -1,3 +1,8 @@
+/*
+---- Create a database and schema of three layers (bronze,silver,gold)
+
+*/
+
 CREATE DATABASE DATAWAREHOUSE;
 
 CREATE SCHEMA bronze;
