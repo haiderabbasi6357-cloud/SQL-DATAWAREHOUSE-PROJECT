@@ -26,7 +26,7 @@ CREATE TABLE bronze.crm_prd_info
 (
 prd_id INT,
 prd_key NVARCHAR(20),
-prd_nm  VARCHAR(20),
+prd_nm  VARCHAR(50),
 prd_cost INT,
 prd_line VARCHAR(20),
 prd_start_dt DATE,
@@ -38,26 +38,27 @@ IF Object_ID ('bronze.crm_sales_details', 'U') IS NOT NULL
 
 CREATE TABLE bronze.crm_sales_details
 (
-sls_ord_num NVARCHAR(20),
-sls_prd_key NVARCHAR(20),
-sls_cust_id VARCHAR(20),
-sls_order_dt DATE,
-sls_ship_dt DATE,
-sls_due_dt DATE,
+sls_ord_num NVARCHAR(30),
+sls_prd_key NVARCHAR(30),
+sls_cust_id VARCHAR(30),
+sls_order_dt VARCHAR(30),
+sls_ship_dt VARCHAR(30),
+sls_due_dt VARCHAR(30),
 sls_sales INT,
 sls_quantity INT,
 sls_price INT
 
 );
 
+
 IF Object_ID ('bronze.erp_cust_az12', 'U') IS NOT NULL
 	DROP TABLE bronze.erp_cust_az12;
 
 CREATE TABLE bronze.erp_cust_az12(
 
-cid NVARCHAR(20),
+cid NVARCHAR(30),
 bdate DATE,
-gen NVARCHAR(10)
+gen NVARCHAR(30)
 );
 
 IF Object_ID ('bronze.erp_loc_a101', 'U') IS NOT NULL
@@ -65,8 +66,8 @@ IF Object_ID ('bronze.erp_loc_a101', 'U') IS NOT NULL
 
 CREATE TABLE bronze.erp_loc_a101(
 
-cid NVARCHAR(20),
-cntry NVARCHAR(10)
+cid NVARCHAR(30),
+cntry NVARCHAR(20)
 );
 
 IF Object_ID ('bronze.erp_px_cat_g1v2', 'U') IS NOT NULL
@@ -75,8 +76,8 @@ IF Object_ID ('bronze.erp_px_cat_g1v2', 'U') IS NOT NULL
 CREATE TABLE bronze.erp_px_cat_g1v2(
 
 id NVARCHAR(20),
-cat NVARCHAR(10),
-subcat NVARCHAR(10),
-maintenance NVARCHAR(10)
+cat NVARCHAR(20),
+subcat NVARCHAR(20),
+maintenance NVARCHAR(20)
 
 );
