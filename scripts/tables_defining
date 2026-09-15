@@ -11,7 +11,7 @@ cst_key NVARCHAR(20),
 cst_firstname VARCHAR(20),
 cst_lastname VARCHAR(20),
 cst_marital_status VARCHAR(20),
-cst_gndr DATE,
+cst_gndr VARCHAR(20),
 cst_create_date DATE
 
 );
