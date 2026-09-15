@@ -9,7 +9,7 @@ CREATE TABLE bronze.crm_cust_info
 cst_id INT,
 cst_key NVARCHAR(20),
 cst_firstname VARCHAR(20),
-cst_lastname INT,
+cst_lastname VARCHAR(20),
 cst_marital_status VARCHAR(20),
 cst_gndr DATE,
 cst_create_date DATE
