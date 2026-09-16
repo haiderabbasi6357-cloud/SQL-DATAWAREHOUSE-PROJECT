@@ -1,3 +1,21 @@
+/* ==================================================================
+   Silver Layer — Data Cleaning & Load
+   ------------------------------------------------------------------
+   Purpose : Cleanses and standardizes raw Bronze layer data and
+             loads it into the Silver layer. Applies trimming,
+             code-to-label mapping, deduplication, date validation,
+             and business-rule corrections for sales figures.
+   Pattern : Each table is truncated and reloaded in full from its
+             corresponding Bronze source.
+   ================================================================== */
+ 
+ 
+-- ------------------------------------------------------------------
+-- Silver: Customer Info
+-- Deduplicates by customer, keeping the most recent record, and
+-- standardizes marital status / gender codes into readable labels.
+-- ------------------------------------------------------------------
+
 ----- CLEANING RAW DATA------
 
 TRUNCATE TABLE silver.crm_cust_info
