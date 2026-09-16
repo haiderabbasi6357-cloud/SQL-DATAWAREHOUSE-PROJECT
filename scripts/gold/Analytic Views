@@ -1,0 +1,60 @@
+-----Creating GOLD DIMENSION CUSTOMERS DIMENSION TABLE VIEWS------
+
+CREATE VIEW gold.dim_customers AS
+SELECT 
+    ROW_NUMBER() OVER(ORDER BY cst_id) AS customer_key,
+        ci.cst_id AS customer_id,
+        ci.cst_key AS customer_number,
+        ci.cst_firstname AS first_name,
+        ci.cst_lastname AS last_name,
+        la.cntry AS country,
+        ci.cst_marital_status AS marital_status,
+        ci.cst_gndr AS gender,
+        ci.cst_create_date AS create_date,
+        cz.bdate AS birthday_date,
+        CASE WHEN
+        ci.cst_gndr !='Unknown' THEN ci.cst_gndr
+        ELSE COALESCE(cz.gen,'Unknown')
+        END AS new_gen
+
+
+    FROM silver.crm_cust_info ci
+    LEFT JOIN silver.erp_cust_az12 cz 
+        ON ci.cst_key = cz.cid
+    LEFT JOIN silver.erp_loc_a101 la 
+        ON ci.cst_key = la.cid
+
+
+-----Creating GOLD DIMENSION PRODUCT DIMENSION TABLE VIEWS------
+
+
+
+
+CREATE VIEW gold_product_view AS
+SELECT
+ROW_NUMBER() OVER(ORDER BY pn.prd_start_dt, pn.prd_key)  AS product_key,
+prd_id AS product_id,cat_id AS category_id ,prd_key AS product_number,prd_nm AS product_name,prd_cost AS cost,prd_line as product_line,prd_start_dt AS start_date, pc.cat,pc.subcat,pc.maintenance
+
+FROM silver.crm_prd_info AS pn
+
+LEFT JOIN silver.erp_px_cat_g1v2 as pc ON pn.cat_id = pc.id
+WHERE prd_end_dt IS NULL
+
+
+
+SELECT sd.sls_ord_num AS order_number,pr.product_key,cu.customer_key,sd.sls_order_dt as order_date,
+sd.sls_ship_dt as ship_date,sd.sls_due_dt as due_date,sd.sls_sales as sales,sd.sls_quantity as quantity ,sd.sls_price as price
+
+
+-----Creating GOLD DIMENSION FACTS TABLE VIEWS------
+
+
+FROM silver.crm_sales_details as sd
+
+LEFT JOIN gold_product_view as pr 
+ON sd.sls_prd_key = pr.product_number
+
+LEFT JOIN gold.dim_customers AS cu
+ON sd.sls_cust_id = cu.customer_id
+
+
