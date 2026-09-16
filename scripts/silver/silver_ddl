@@ -1,5 +1,20 @@
------CREATING SILVER TABLE-------- 
-
+ Silver Layer — Table Definitions
+   ------------------------------------------------------------------
+   Purpose : Creates the Silver layer tables that hold cleansed,
+             standardized data loaded from the Bronze layer. Each
+             table adds a dwh_create_date column to track when the
+             record was loaded into the warehouse.
+   Sources : Populated by the Silver cleaning/load script from the
+             corresponding bronze.* tables.
+   Notes   : Each table is dropped and recreated if it already
+             exists, so this script can be safely re-run.
+   ================================================================== */
+ 
+ 
+-- ------------------------------------------------------------------
+-- Silver: Customer Info
+-- Cleansed CRM customer master data.
+-- ------------------------------------------------------------------
 
 
 IF Object_ID ('silver.crm_cust_info', 'U') IS NOT NULL
