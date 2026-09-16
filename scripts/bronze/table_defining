@@ -1,3 +1,22 @@
+/* ==================================================================
+   Bronze Layer — Table Definitions
+   ------------------------------------------------------------------
+   Purpose : Creates the raw landing tables for the Bronze layer of
+             the SQL Data Warehouse. These tables store source data
+             as-is, with no transformations applied, loaded via
+             full load / truncate & insert from CRM and ERP sources.
+   Sources : CRM (customer, product, sales) and ERP (customer,
+             location, product category) system extracts.
+   Notes   : Each table is dropped and recreated if it already
+             exists, so this script can be safely re-run.
+   ================================================================== */
+ 
+ 
+-- ------------------------------------------------------------------
+-- CRM: Customer Info
+-- Raw customer master data from the CRM system.
+-- ------------------------------------------------------------------
+
 ---Defining Tables-----
 
 
