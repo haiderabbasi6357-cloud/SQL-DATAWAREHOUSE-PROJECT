@@ -1,0 +1,144 @@
+/* ==================================================================
+   Data Quality Tests — Silver & Gold Layers
+   ------------------------------------------------------------------
+   Purpose : Validation queries to run after each load to catch
+             duplicates, nulls, bad formatting, and referential
+             integrity issues before data reaches the Gold layer.
+   How to use : Every query below should return ZERO rows if the
+             data is clean. Any row returned points to a problem
+             worth investigating.
+   ================================================================== */
+
+
+-- ==================================================================
+-- SILVER LAYER CHECKS
+-- ==================================================================
+
+-- ------------------------------------------------------------------
+-- crm_cust_info: duplicate or null customer IDs
+-- Expect: no rows (cst_id should be unique and never null after
+-- the dedup logic in the Silver load).
+-- ------------------------------------------------------------------
+SELECT cst_id, COUNT(*) AS cnt
+FROM silver.crm_cust_info
+GROUP BY cst_id
+HAVING COUNT(*) > 1 OR cst_id IS NULL;
+
+-- ------------------------------------------------------------------
+-- crm_cust_info: unwanted leading/trailing spaces
+-- Expect: no rows (TRIM should have removed these on load).
+-- ------------------------------------------------------------------
+SELECT cst_firstname, cst_lastname
+FROM silver.crm_cust_info
+WHERE cst_firstname != TRIM(cst_firstname)
+   OR cst_lastname != TRIM(cst_lastname);
+
+-- ------------------------------------------------------------------
+-- crm_cust_info: marital status / gender values outside the
+-- expected standardized set
+-- Expect: no rows.
+-- ------------------------------------------------------------------
+SELECT DISTINCT cst_marital_status
+FROM silver.crm_cust_info
+WHERE cst_marital_status NOT IN ('Married', 'Single', 'Unknown');
+
+SELECT DISTINCT cst_gndr
+FROM silver.crm_cust_info
+WHERE cst_gndr NOT IN ('Male', 'Female', 'Unknown');
+
+-- ------------------------------------------------------------------
+-- crm_prd_info: negative or null cost
+-- Expect: no rows (ISNULL defaults cost to 0 on load).
+-- ------------------------------------------------------------------
+SELECT prd_id, prd_cost
+FROM silver.crm_prd_info
+WHERE prd_cost < 0 OR prd_cost IS NULL;
+
+-- ------------------------------------------------------------------
+-- crm_prd_info: end date earlier than start date
+-- Expect: no rows.
+-- ------------------------------------------------------------------
+SELECT prd_id, prd_start_dt, prd_end_dt
+FROM silver.crm_prd_info
+WHERE prd_end_dt < prd_start_dt;
+
+-- ------------------------------------------------------------------
+-- crm_sales_details: order date later than ship or due date
+-- Expect: no rows.
+-- ------------------------------------------------------------------
+SELECT sls_ord_num, sls_order_dt, sls_ship_dt, sls_due_dt
+FROM silver.crm_sales_details
+WHERE sls_order_dt > sls_ship_dt
+   OR sls_order_dt > sls_due_dt;
+
+-- ------------------------------------------------------------------
+-- crm_sales_details: sales not equal to quantity * price, or any
+-- of the three negative/null
+-- Expect: no rows (the Silver load recalculates these).
+-- ------------------------------------------------------------------
+SELECT sls_ord_num, sls_sales, sls_quantity, sls_price
+FROM silver.crm_sales_details
+WHERE sls_sales != sls_quantity * sls_price
+   OR sls_sales IS NULL OR sls_sales < 0
+   OR sls_quantity IS NULL OR sls_quantity <= 0
+   OR sls_price IS NULL OR sls_price <= 0;
+
+-- ------------------------------------------------------------------
+-- erp_cust_az12: birthdates outside a plausible range
+-- Expect: no rows (adjust the lower bound to fit your data).
+-- ------------------------------------------------------------------
+SELECT cid, bdate
+FROM silver.erp_cust_az12
+WHERE bdate < '1924-01-01' OR bdate > GETDATE();
+
+-- ------------------------------------------------------------------
+-- erp_cust_az12: gender values outside the expected set
+-- Expect: no rows.
+-- ------------------------------------------------------------------
+SELECT DISTINCT gen
+FROM silver.erp_cust_az12
+WHERE gen NOT IN ('Male', 'Female', 'Unknown');
+
+-- ------------------------------------------------------------------
+-- erp_loc_a101: country values that still look unstandardized
+-- Expect: no rows beyond genuinely new countries you haven't
+-- mapped yet — review any that appear.
+-- ------------------------------------------------------------------
+SELECT DISTINCT cntry
+FROM silver.erp_loc_a101
+ORDER BY cntry;
+
+
+-- ==================================================================
+-- GOLD LAYER CHECKS
+-- ==================================================================
+
+-- ------------------------------------------------------------------
+-- dim_customers: surrogate key should be unique
+-- Expect: no rows.
+-- ------------------------------------------------------------------
+SELECT customer_key, COUNT(*) AS cnt
+FROM gold.dim_customers
+GROUP BY customer_key
+HAVING COUNT(*) > 1;
+
+-- ------------------------------------------------------------------
+-- dim_products: surrogate key should be unique
+-- Expect: no rows.
+-- ------------------------------------------------------------------
+SELECT product_key, COUNT(*) AS cnt
+FROM gold.dim_products
+GROUP BY product_key
+HAVING COUNT(*) > 1;
+
+-- ------------------------------------------------------------------
+-- fact_sales: orphan rows with no matching customer or product
+-- Expect: no rows (every sale should join to a known dimension
+-- member; a match failure means a join key mismatch upstream).
+-- ------------------------------------------------------------------
+SELECT f.order_number, f.customer_key, f.product_key
+FROM gold.fact_sales f
+LEFT JOIN gold.dim_customers c ON f.customer_key = c.customer_key
+LEFT JOIN gold.dim_products p ON f.product_key = p.product_key
+WHERE c.customer_key IS NULL
+   OR p.product_key IS NULL;
