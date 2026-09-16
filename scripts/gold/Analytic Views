@@ -1,3 +1,24 @@
+* ==================================================================
+   Gold Layer — Dimension & Fact View Definitions
+   ------------------------------------------------------------------
+   Purpose : Creates the business-ready Gold layer views on top of
+             the Silver layer. Combines CRM and ERP data into a
+             star schema (customer dimension, product dimension,
+             sales fact) ready for BI and ad-hoc analysis.
+   Source  : silver.crm_cust_info, silver.crm_prd_info,
+             silver.crm_sales_details, silver.erp_cust_az12,
+             silver.erp_loc_a101, silver.erp_px_cat_g1v2
+   ================================================================== */
+ 
+ 
+-- ------------------------------------------------------------------
+-- Gold: Customers Dimension
+-- Combines CRM customer master data with ERP demographic and
+-- location data into a single customer dimension.
+-- ------------------------------------------------------------------
+
+
+
 -----Creating GOLD DIMENSION CUSTOMERS DIMENSION TABLE VIEWS------
 
 CREATE VIEW gold.dim_customers AS
@@ -42,12 +63,11 @@ WHERE prd_end_dt IS NULL
 
 
 
-SELECT sd.sls_ord_num AS order_number,pr.product_key,cu.customer_key,sd.sls_order_dt as order_date,
-sd.sls_ship_dt as ship_date,sd.sls_due_dt as due_date,sd.sls_sales as sales,sd.sls_quantity as quantity ,sd.sls_price as price
-
-
 -----Creating GOLD DIMENSION FACTS TABLE VIEWS------
 
+
+SELECT sd.sls_ord_num AS order_number,pr.product_key,cu.customer_key,sd.sls_order_dt as order_date,
+sd.sls_ship_dt as ship_date,sd.sls_due_dt as due_date,sd.sls_sales as sales,sd.sls_quantity as quantity ,sd.sls_price as price
 
 FROM silver.crm_sales_details as sd
 
