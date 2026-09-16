@@ -1,6 +1,6 @@
 ----- CLEANING RAW DATA------
 
-
+TRUNCATE TABLE silver.crm_cust_info
 INSERT INTO silver.crm_cust_info(
 cst_id,cst_key,cst_firstname, cst_lastname,cst_marital_status,cst_gndr,cst_create_date
 
@@ -34,7 +34,7 @@ WHERE flag_last =1 AND cst_id is NOT NULL
 
 ----CLEANING DATA bronze.crm.prd,info---------
 
-
+TRUNCATE TABLE  silver.crm_prd_info
 INSERT INTO silver.crm_prd_info(
 prd_id,
 cat_id,
@@ -64,7 +64,10 @@ END AS prd_line
 
 FROM bronze.crm_prd_info
 
+
 ------   Clean CRM SALES DETAILS   -------
+ TRUNCATE TABLE silver.crm_sales_details
+
 INSERT INTO silver.crm_sales_details(
 sls_ord_num,
 sls_prd_key,
@@ -77,8 +80,6 @@ sls_quantity,
 sls_price
 
 )
-
-------CLEAN DATA SALES-------
 
 
 SELECT sls_ord_num, sls_prd_key, sls_cust_id, 
@@ -110,8 +111,11 @@ END AS sls_price
 
 FROM  bronze.crm_sales_details
 
+
+
 ----CLEANING ERP Customer Data----
 
+TRUNCATE TABLE  silver.erp_cust_az12
 INSERT INTO silver.erp_cust_az12
 (
 cid,
@@ -143,6 +147,7 @@ FROM bronze.erp_cust_az12
 
 ----- CLEAN SILVER ERP-LOCATION------
 
+TRUNCATE TABLE silver.erp_loc_a101
 
 INSERT INTO silver.erp_loc_a101(
 cid,
@@ -162,7 +167,7 @@ END AS cntry
 
 ====== CLEAN SILVER ERP-CAT-----
 
-
+TRUNCATE TABLE silver.erp_px_cat_g1v2
 INSERT INTO silver.erp_px_cat_g1v2(
 id,
 cat,
