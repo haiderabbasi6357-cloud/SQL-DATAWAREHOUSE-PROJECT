@@ -2,7 +2,7 @@
 
 An end-to-end data warehousing project that ingests raw source data, cleans and transforms it through a layered architecture, and models it into a star schema ready for analytics and BI reporting.
 
-## Overview
+### Overview and Structure
 
 This project demonstrates a complete ETL workflow built on SQL Server, following industry-standard data warehousing practices. Raw data from multiple source systems is loaded into a staging layer, cleansed and standardised, then modelled into fact and dimension tables that power downstream reporting.
 
